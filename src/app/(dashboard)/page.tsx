@@ -19,6 +19,10 @@ import {
   MapPin,
   Star,
   Tag,
+  MapPinned,
+  Eye,
+  ScrollText,
+  MessageCircle,
 } from "lucide-react";
 import { StatCard } from "@/components/ui/StatCard";
 import { apiFetch } from "@/lib/apiClient";
@@ -54,11 +58,18 @@ interface PlaceStats {
   avgRating: number | null;
 }
 
+interface LocationStats {
+  total: number;
+  visible: number;
+  hidden: number;
+}
+
 export default function OverviewPage() {
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [communityStats, setCommunityStats] = useState<CommunityStats | null>(null);
   const [eventStats, setEventStats] = useState<EventStats | null>(null);
   const [placeStats, setPlaceStats] = useState<PlaceStats | null>(null);
+  const [locationStats, setLocationStats] = useState<LocationStats | null>(null);
 
   useEffect(() => {
     apiFetch<{ success: boolean; stats: UserStats }>("/api/admin/users/stats")
@@ -72,6 +83,9 @@ export default function OverviewPage() {
       .catch(() => {});
     apiFetch<{ success: boolean; stats: PlaceStats }>("/api/admin/places/stats")
       .then((data) => setPlaceStats(data.stats))
+      .catch(() => {});
+    apiFetch<{ success: boolean; stats: LocationStats }>("/api/admin/locations?limit=1")
+      .then((data) => setLocationStats(data.stats))
       .catch(() => {});
   }, []);
 
@@ -209,19 +223,53 @@ export default function OverviewPage() {
         />
       </div>
 
-      <h2 className="text-xs font-medium text-muted uppercase tracking-wide mb-3">
-        Other modules
-      </h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {["Locations"].map((name) => (
-          <div
-            key={name}
-            className="bg-surface border border-border rounded-xl p-4 opacity-50 select-none"
-          >
-            <p className="text-sm font-medium text-foreground">{name}</p>
-            <p className="text-xs text-muted mt-1">Coming soon</p>
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-xs font-medium text-muted uppercase tracking-wide">Locations</h2>
+        <Link
+          href="/locations"
+          className="text-xs text-accent hover:brightness-110 flex items-center gap-1"
+        >
+          View map activity
+          <ArrowRight className="h-3 w-3" />
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 mb-8 max-w-md">
+        <StatCard label="Total" value={locationStats ? locationStats.total : "–"} icon={MapPinned} />
+        <StatCard label="Visible" value={locationStats ? locationStats.visible : "–"} icon={Eye} />
+        <StatCard
+          label="Hidden"
+          value={locationStats ? locationStats.hidden : "–"}
+          icon={EyeOff}
+          tone={locationStats && locationStats.hidden > 0 ? "warning" : "default"}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 max-w-md">
+        <Link
+          href="/chat"
+          className="bg-surface border border-border rounded-xl p-4 hover:border-accent/30 transition-colors flex items-center gap-3"
+        >
+          <div className="h-9 w-9 rounded-lg bg-surface-raised border border-border flex items-center justify-center shrink-0">
+            <MessageCircle className="h-4 w-4 text-muted" />
           </div>
-        ))}
+          <div>
+            <p className="text-sm font-medium text-foreground">Chat</p>
+            <p className="text-xs text-muted mt-0.5">Moderate DMs & room chat</p>
+          </div>
+        </Link>
+        <Link
+          href="/audit-log"
+          className="bg-surface border border-border rounded-xl p-4 hover:border-accent/30 transition-colors flex items-center gap-3"
+        >
+          <div className="h-9 w-9 rounded-lg bg-surface-raised border border-border flex items-center justify-center shrink-0">
+            <ScrollText className="h-4 w-4 text-muted" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-foreground">Audit log</p>
+            <p className="text-xs text-muted mt-0.5">Every admin action</p>
+          </div>
+        </Link>
       </div>
     </div>
   );

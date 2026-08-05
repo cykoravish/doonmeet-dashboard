@@ -24,8 +24,8 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Events", href: "/events", icon: CalendarDays },
   { label: "Places", href: "/places", icon: MapPin },
   { label: "Chat", href: "/chat", icon: MessageCircle },
-  { label: "Locations", href: "/locations", icon: MapPinned, comingSoon: true },
-  { label: "Audit log", href: "/audit-log", icon: ScrollText, comingSoon: true },
+  { label: "Locations", href: "/locations", icon: MapPinned },
+  { label: "Audit log", href: "/audit-log", icon: ScrollText },
 ];
 
 export function isNavItemActive(pathname: string, href: string): boolean {
