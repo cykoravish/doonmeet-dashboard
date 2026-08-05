@@ -16,6 +16,9 @@ import {
   CalendarDays,
   FileEdit,
   CalendarClock,
+  MapPin,
+  Star,
+  Tag,
 } from "lucide-react";
 import { StatCard } from "@/components/ui/StatCard";
 import { apiFetch } from "@/lib/apiClient";
@@ -44,10 +47,18 @@ interface EventStats {
   upcoming: number;
 }
 
+interface PlaceStats {
+  total: number;
+  categoryCount: number;
+  totalReviews: number;
+  avgRating: number | null;
+}
+
 export default function OverviewPage() {
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [communityStats, setCommunityStats] = useState<CommunityStats | null>(null);
   const [eventStats, setEventStats] = useState<EventStats | null>(null);
+  const [placeStats, setPlaceStats] = useState<PlaceStats | null>(null);
 
   useEffect(() => {
     apiFetch<{ success: boolean; stats: UserStats }>("/api/admin/users/stats")
@@ -58,6 +69,9 @@ export default function OverviewPage() {
       .catch(() => {});
     apiFetch<{ success: boolean; stats: EventStats }>("/api/admin/events/stats")
       .then((data) => setEventStats(data.stats))
+      .catch(() => {});
+    apiFetch<{ success: boolean; stats: PlaceStats }>("/api/admin/places/stats")
+      .then((data) => setPlaceStats(data.stats))
       .catch(() => {});
   }, []);
 
@@ -165,11 +179,41 @@ export default function OverviewPage() {
         />
       </div>
 
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-xs font-medium text-muted uppercase tracking-wide">Places</h2>
+        <Link
+          href="/places"
+          className="text-xs text-accent hover:brightness-110 flex items-center gap-1"
+        >
+          Manage places
+          <ArrowRight className="h-3 w-3" />
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+        <StatCard label="Total" value={placeStats ? placeStats.total : "–"} icon={MapPin} />
+        <StatCard
+          label="Categories"
+          value={placeStats ? placeStats.categoryCount : "–"}
+          icon={Tag}
+        />
+        <StatCard
+          label="Reviews"
+          value={placeStats ? placeStats.totalReviews : "–"}
+          icon={MessageSquare}
+        />
+        <StatCard
+          label="Avg rating"
+          value={placeStats?.avgRating != null ? placeStats.avgRating : "–"}
+          icon={Star}
+        />
+      </div>
+
       <h2 className="text-xs font-medium text-muted uppercase tracking-wide mb-3">
         Other modules
       </h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {["Places", "Chat", "Locations"].map((name) => (
+        {["Chat", "Locations"].map((name) => (
           <div
             key={name}
             className="bg-surface border border-border rounded-xl p-4 opacity-50 select-none"
