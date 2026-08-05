@@ -23,7 +23,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Communities", href: "/communities", icon: Users2 },
   { label: "Events", href: "/events", icon: CalendarDays },
   { label: "Places", href: "/places", icon: MapPin },
-  { label: "Chat", href: "/chat", icon: MessageCircle, comingSoon: true },
+  { label: "Chat", href: "/chat", icon: MessageCircle },
   { label: "Locations", href: "/locations", icon: MapPinned, comingSoon: true },
   { label: "Audit log", href: "/audit-log", icon: ScrollText, comingSoon: true },
 ];

@@ -213,7 +213,7 @@ export default function OverviewPage() {
         Other modules
       </h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {["Chat", "Locations"].map((name) => (
+        {["Locations"].map((name) => (
           <div
             key={name}
             className="bg-surface border border-border rounded-xl p-4 opacity-50 select-none"
