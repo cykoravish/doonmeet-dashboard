@@ -1,0 +1,48 @@
+import { NextResponse } from "next/server";
+import mongoose from "mongoose";
+import { connectDB } from "@/lib/db";
+import { CommunityMember } from "@/models/CommunityMember";
+import { withAdminAuth, AuthenticatedAdminRequest } from "@/middleware/withAdminAuth";
+import { adminApiLimiter } from "@/lib/rateLimit";
+
+type Params = { params: Promise<{ communityId: string }> };
+
+export const GET = withAdminAuth(async (req: AuthenticatedAdminRequest, context) => {
+  const limited = adminApiLimiter(req);
+  if (limited) return limited;
+
+  const { communityId } = await (context as unknown as Params).params;
+  if (!mongoose.Types.ObjectId.isValid(communityId)) {
+    return NextResponse.json({ success: false, message: "Invalid community id" }, { status: 400 });
+  }
+
+  try {
+    await connectDB();
+
+    const { searchParams } = new URL(req.url);
+    const page = Math.max(1, Number(searchParams.get("page") ?? 1));
+    const limit = Math.min(100, Math.max(1, Number(searchParams.get("limit") ?? 20)));
+
+    const [members, total] = await Promise.all([
+      CommunityMember.find({ community: communityId })
+        .populate("user", "name email avatar isActive")
+        .sort({ joinedAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean(),
+      CommunityMember.countDocuments({ community: communityId }),
+    ]);
+
+    return NextResponse.json({
+      success: true,
+      members,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) || 1 },
+    });
+  } catch (error) {
+    console.error("[admin community members] Error:", error);
+    return NextResponse.json(
+      { success: false, message: "Failed to fetch members" },
+      { status: 500 }
+    );
+  }
+});

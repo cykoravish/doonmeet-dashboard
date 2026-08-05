@@ -2,7 +2,18 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Users, UserCheck, Ban, UserRoundX, ShieldAlert, TrendingUp, ArrowRight } from "lucide-react";
+import {
+  Users,
+  UserCheck,
+  Ban,
+  UserRoundX,
+  ShieldAlert,
+  TrendingUp,
+  ArrowRight,
+  Users2,
+  MessageSquare,
+  EyeOff,
+} from "lucide-react";
 import { StatCard } from "@/components/ui/StatCard";
 import { apiFetch } from "@/lib/apiClient";
 
@@ -15,12 +26,23 @@ interface UserStats {
   newThisWeek: number;
 }
 
+interface CommunityStats {
+  total: number;
+  active: number;
+  inactive: number;
+  totalPosts: number;
+}
+
 export default function OverviewPage() {
-  const [stats, setStats] = useState<UserStats | null>(null);
+  const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const [communityStats, setCommunityStats] = useState<CommunityStats | null>(null);
 
   useEffect(() => {
     apiFetch<{ success: boolean; stats: UserStats }>("/api/admin/users/stats")
-      .then((data) => setStats(data.stats))
+      .then((data) => setUserStats(data.stats))
+      .catch(() => {});
+    apiFetch<{ success: boolean; stats: CommunityStats }>("/api/admin/communities/stats")
+      .then((data) => setCommunityStats(data.stats))
       .catch(() => {});
   }, []);
 
@@ -43,29 +65,64 @@ export default function OverviewPage() {
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
-        <StatCard label="Total users" value={stats ? stats.total : "–"} icon={Users} />
-        <StatCard label="Active" value={stats ? stats.active : "–"} icon={UserCheck} />
+        <StatCard label="Total users" value={userStats ? userStats.total : "–"} icon={Users} />
+        <StatCard label="Active" value={userStats ? userStats.active : "–"} icon={UserCheck} />
         <StatCard
           label="Banned"
-          value={stats ? stats.banned : "–"}
+          value={userStats ? userStats.banned : "–"}
           icon={Ban}
-          tone={stats && stats.banned > 0 ? "danger" : "default"}
+          tone={userStats && userStats.banned > 0 ? "danger" : "default"}
         />
-        <StatCard label="Guests" value={stats ? stats.guests : "–"} icon={UserRoundX} />
+        <StatCard label="Guests" value={userStats ? userStats.guests : "–"} icon={UserRoundX} />
         <StatCard
           label="Unverified"
-          value={stats ? stats.unverified : "–"}
+          value={userStats ? userStats.unverified : "–"}
           icon={ShieldAlert}
-          tone={stats && stats.unverified > 0 ? "warning" : "default"}
+          tone={userStats && userStats.unverified > 0 ? "warning" : "default"}
         />
-        <StatCard label="New this week" value={stats ? stats.newThisWeek : "–"} icon={TrendingUp} />
+        <StatCard
+          label="New this week"
+          value={userStats ? userStats.newThisWeek : "–"}
+          icon={TrendingUp}
+        />
+      </div>
+
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-xs font-medium text-muted uppercase tracking-wide">Communities</h2>
+        <Link
+          href="/communities"
+          className="text-xs text-accent hover:brightness-110 flex items-center gap-1"
+        >
+          Manage communities
+          <ArrowRight className="h-3 w-3" />
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+        <StatCard label="Total" value={communityStats ? communityStats.total : "–"} icon={Users2} />
+        <StatCard
+          label="Active"
+          value={communityStats ? communityStats.active : "–"}
+          icon={UserCheck}
+        />
+        <StatCard
+          label="Deactivated"
+          value={communityStats ? communityStats.inactive : "–"}
+          icon={EyeOff}
+          tone={communityStats && communityStats.inactive > 0 ? "warning" : "default"}
+        />
+        <StatCard
+          label="Total posts"
+          value={communityStats ? communityStats.totalPosts : "–"}
+          icon={MessageSquare}
+        />
       </div>
 
       <h2 className="text-xs font-medium text-muted uppercase tracking-wide mb-3">
         Other modules
       </h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {["Communities", "Events", "Places", "Chat", "Locations"].map((name) => (
+        {["Events", "Places", "Chat", "Locations"].map((name) => (
           <div
             key={name}
             className="bg-surface border border-border rounded-xl p-4 opacity-50 select-none"

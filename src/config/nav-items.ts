@@ -20,7 +20,7 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { label: "Overview", href: "/", icon: LayoutDashboard },
   { label: "Users", href: "/users", icon: Users },
-  { label: "Communities", href: "/communities", icon: Users2, comingSoon: true },
+  { label: "Communities", href: "/communities", icon: Users2 },
   { label: "Events", href: "/events", icon: CalendarDays, comingSoon: true },
   { label: "Places", href: "/places", icon: MapPin, comingSoon: true },
   { label: "Chat", href: "/chat", icon: MessageCircle, comingSoon: true },
