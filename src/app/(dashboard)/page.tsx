@@ -13,6 +13,9 @@ import {
   Users2,
   MessageSquare,
   EyeOff,
+  CalendarDays,
+  FileEdit,
+  CalendarClock,
 } from "lucide-react";
 import { StatCard } from "@/components/ui/StatCard";
 import { apiFetch } from "@/lib/apiClient";
@@ -33,9 +36,18 @@ interface CommunityStats {
   totalPosts: number;
 }
 
+interface EventStats {
+  total: number;
+  published: number;
+  draft: number;
+  cancelled: number;
+  upcoming: number;
+}
+
 export default function OverviewPage() {
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [communityStats, setCommunityStats] = useState<CommunityStats | null>(null);
+  const [eventStats, setEventStats] = useState<EventStats | null>(null);
 
   useEffect(() => {
     apiFetch<{ success: boolean; stats: UserStats }>("/api/admin/users/stats")
@@ -43,6 +55,9 @@ export default function OverviewPage() {
       .catch(() => {});
     apiFetch<{ success: boolean; stats: CommunityStats }>("/api/admin/communities/stats")
       .then((data) => setCommunityStats(data.stats))
+      .catch(() => {});
+    apiFetch<{ success: boolean; stats: EventStats }>("/api/admin/events/stats")
+      .then((data) => setEventStats(data.stats))
       .catch(() => {});
   }, []);
 
@@ -118,11 +133,43 @@ export default function OverviewPage() {
         />
       </div>
 
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-xs font-medium text-muted uppercase tracking-wide">Events</h2>
+        <Link
+          href="/events"
+          className="text-xs text-accent hover:brightness-110 flex items-center gap-1"
+        >
+          Manage events
+          <ArrowRight className="h-3 w-3" />
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-8">
+        <StatCard label="Total" value={eventStats ? eventStats.total : "–"} icon={CalendarDays} />
+        <StatCard
+          label="Upcoming"
+          value={eventStats ? eventStats.upcoming : "–"}
+          icon={CalendarClock}
+        />
+        <StatCard
+          label="Published"
+          value={eventStats ? eventStats.published : "–"}
+          icon={UserCheck}
+        />
+        <StatCard label="Draft" value={eventStats ? eventStats.draft : "–"} icon={FileEdit} />
+        <StatCard
+          label="Cancelled"
+          value={eventStats ? eventStats.cancelled : "–"}
+          icon={Ban}
+          tone={eventStats && eventStats.cancelled > 0 ? "danger" : "default"}
+        />
+      </div>
+
       <h2 className="text-xs font-medium text-muted uppercase tracking-wide mb-3">
         Other modules
       </h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {["Events", "Places", "Chat", "Locations"].map((name) => (
+        {["Places", "Chat", "Locations"].map((name) => (
           <div
             key={name}
             className="bg-surface border border-border rounded-xl p-4 opacity-50 select-none"

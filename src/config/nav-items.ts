@@ -21,7 +21,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Overview", href: "/", icon: LayoutDashboard },
   { label: "Users", href: "/users", icon: Users },
   { label: "Communities", href: "/communities", icon: Users2 },
-  { label: "Events", href: "/events", icon: CalendarDays, comingSoon: true },
+  { label: "Events", href: "/events", icon: CalendarDays },
   { label: "Places", href: "/places", icon: MapPin, comingSoon: true },
   { label: "Chat", href: "/chat", icon: MessageCircle, comingSoon: true },
   { label: "Locations", href: "/locations", icon: MapPinned, comingSoon: true },
