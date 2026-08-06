@@ -20,9 +20,15 @@ function formatDateTime(d: string) {
 }
 
 function actionTone(action: string): "positive" | "negative" | "neutral" | "warning" {
-  if (action.includes("delete") || action.includes("ban") && !action.includes("unban")) return "negative";
+  const isBanNotUnban = action.includes("ban") && !action.includes("unban");
+  if (action.includes("delete") || isBanNotUnban) return "negative";
   if (action.includes("view")) return "warning";
-  if (action.includes("create") || action.includes("unban") || action.includes("unhide") || action.includes("verify")) {
+  if (
+    action.includes("create") ||
+    action.includes("unban") ||
+    action.includes("unhide") ||
+    action.includes("verify")
+  ) {
     return "positive";
   }
   return "neutral";

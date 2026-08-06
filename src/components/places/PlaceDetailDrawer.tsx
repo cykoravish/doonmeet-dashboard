@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Star, Trash2, Loader2, X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Field } from "@/components/ui/Field";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { EmptyState } from "@/components/ui/Feedback";
 import { apiFetch, ApiError } from "@/lib/apiClient";
@@ -380,15 +381,6 @@ export function PlaceDetailDrawer({
         onConfirm={handleDelete}
         onCancel={() => setConfirmDelete(false)}
       />
-    </div>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label className="text-xs text-muted mb-1.5 block">{label}</label>
-      {children}
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
+import { Field } from "@/components/ui/Field";
 import { apiFetch, ApiError } from "@/lib/apiClient";
 
 function toLocalDatetimeInputValue(d: Date): string {
@@ -148,14 +149,5 @@ export function CreateEventModal({
         </Button>
       </form>
     </Modal>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label className="text-xs text-muted mb-1.5 block">{label}</label>
-      {children}
-    </div>
   );
 }

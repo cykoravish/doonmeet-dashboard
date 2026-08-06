@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { EmptyState } from "@/components/ui/Feedback";
+import { Field } from "@/components/ui/Field";
 import { apiFetch, ApiError } from "@/lib/apiClient";
 import type {
   AdminCommunityListItem,
@@ -458,15 +459,6 @@ export function CommunityDetailDrawer({
         onConfirm={handleDelete}
         onCancel={() => setConfirmDelete(false)}
       />
-    </div>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <label className="text-xs text-muted mb-1.5 block">{label}</label>
-      {children}
     </div>
   );
 }

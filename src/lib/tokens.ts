@@ -64,9 +64,15 @@ export function setAdminAuthCookies(
     "Set-Cookie",
     `${ADMIN_ACCESS_COOKIE}=${accessToken}; HttpOnly; Path=/; Max-Age=900; SameSite=Strict${secureFlag}`
   );
+  // Path=/ (not scoped to /api/admin/auth) so the root middleware can detect
+  // a valid refresh token on normal page navigations too, and let the page
+  // load instead of bouncing to /login — the client then silently refreshes
+  // the access token via a fetch to /api/admin/auth/refresh. The cookie
+  // itself is only ever read server-side (httpOnly) and only consumed by
+  // the auth routes, so widening its path doesn't expose it to anything new.
   response.headers.append(
     "Set-Cookie",
-    `${ADMIN_REFRESH_COOKIE}=${refreshToken}; HttpOnly; Path=/api/admin/auth; Max-Age=604800; SameSite=Strict${secureFlag}`
+    `${ADMIN_REFRESH_COOKIE}=${refreshToken}; HttpOnly; Path=/; Max-Age=604800; SameSite=Strict${secureFlag}`
   );
 }
 
@@ -77,7 +83,7 @@ export function clearAdminAuthCookies(response: Response): void {
   );
   response.headers.append(
     "Set-Cookie",
-    `${ADMIN_REFRESH_COOKIE}=; HttpOnly; Path=/api/admin/auth; Max-Age=0; SameSite=Strict`
+    `${ADMIN_REFRESH_COOKIE}=; HttpOnly; Path=/; Max-Age=0; SameSite=Strict`
   );
 }
 

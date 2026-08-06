@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DoonMeet Dashboard
 
-## Getting Started
+Admin control center for [DoonMeet](https://doonmeet.in) — a standalone Next.js app (frontend + backend together) that connects directly to the same MongoDB database as the main platform. It has its own, completely separate authentication system from the user-facing app.
 
-First, run the development server:
+## Modules
+
+| Module | What it does |
+|---|---|
+| Users | Search/filter accounts, view activity, ban/unban, force-verify, manage sessions, delete |
+| Communities | Create/edit/deactivate, manage members, moderate posts, set announcements |
+| Events | Create/edit/cancel, manage attendees, moderate comments |
+| Places | Add/edit local spots, moderate reviews |
+| Chat | View & moderate DM conversations (view access is audit-logged) and public room chat |
+| Locations | Monitor live map check-ins, hide/remove |
+| Audit log | Read-only trail of every admin action |
+
+## Getting started
 
 ```bash
+npm install
+cp .env.example .env.local   # fill in the values, see below
+npm run create-admin -- --name "Your Name" --email you@doonmeet.in --password "a-strong-password"
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) and log in with the admin account you just created.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+See `.env.example`. You'll need:
 
-## Learn More
+- `MONGODB_URI` — the **same** connection string doonmeet (the main app) uses. This dashboard reads and writes the same collections directly.
+- `ADMIN_ACCESS_TOKEN_SECRET` / `ADMIN_REFRESH_TOKEN_SECRET` — generate each with `openssl rand -base64 48`. These **must** be different from any secrets used by the main doonmeet app — admin sessions are completely isolated from user sessions.
 
-To learn more about Next.js, take a look at the following resources:
+## Creating admin accounts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+There is no sign-up route anywhere in this app. The only way to create or update an admin account is the CLI script:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run create-admin -- --name "Name" --email admin@doonmeet.in --password "..."
+```
 
-## Deploy on Vercel
+Running it again with an existing email updates that admin's name/password and re-activates the account.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Notes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Place images are added via URL for now — there's no upload widget yet.
+- 2FA is intentionally not implemented at this stage.
+- Every mutating action (and every private-conversation view) is recorded in the audit log, visible at `/audit-log`.
