@@ -46,7 +46,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      <div className="flex-1 min-w-0 flex flex-col md:ml-60">
+      <div className="flex-1 min-w-0 flex flex-col">
         <header className="h-16 border-b border-border flex items-center justify-between px-4 md:px-6 shrink-0 sticky top-0 bg-background/80 backdrop-blur-sm z-30">
           <button
             onClick={() => setMobileOpen(true)}
