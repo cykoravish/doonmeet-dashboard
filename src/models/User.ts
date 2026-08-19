@@ -31,6 +31,10 @@ export interface IUser extends Document {
   isVerified: boolean;
   isActive: boolean;
   lastSeenAt: Date;
+  // Cooldown trackers for automated emails, written by the main app —
+  // mirrored here read-only for display in the admin dashboard.
+  lastDmEmailAt: Date | null;
+  lastInactivityEmailAt: Date | null;
   // Methods
   comparePassword(password: string): Promise<boolean>;
 }
@@ -127,6 +131,8 @@ const UserSchema = new Schema<IUser>(
     isVerified: { type: Boolean, default: false }, // true after email link click or Google signup
     isActive: { type: Boolean, default: true }, // false = soft banned
     lastSeenAt: { type: Date, default: Date.now },
+    lastDmEmailAt: { type: Date, default: null },
+    lastInactivityEmailAt: { type: Date, default: null },
   },
   {
     timestamps: true, // adds createdAt, updatedAt
