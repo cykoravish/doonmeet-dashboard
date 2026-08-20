@@ -8,6 +8,7 @@ import {
   MapPinned,
   ScrollText,
   Mail,
+  Megaphone,
   type LucideIcon,
 } from "lucide-react";
 
@@ -26,6 +27,8 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Places", href: "/places", icon: MapPin },
   { label: "Chat", href: "/chat", icon: MessageCircle },
   { label: "Locations", href: "/locations", icon: MapPinned },
+  { label: "Broadcast", href: "/broadcasts", icon: Megaphone },
+  { label: "Send email", href: "/send-email", icon: Mail },
   { label: "Email logs", href: "/email-logs", icon: Mail },
   { label: "Audit log", href: "/audit-log", icon: ScrollText },
 ];
