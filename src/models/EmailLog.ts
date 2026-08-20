@@ -2,7 +2,12 @@
 // only ever reads from this collection, never writes to it.
 import mongoose, { Document, Schema } from "mongoose";
 
-export type EmailType = "verification" | "password_reset" | "new_dm" | "inactivity_reminder";
+export type EmailType =
+  | "verification"
+  | "password_reset"
+  | "new_dm"
+  | "inactivity_reminder"
+  | "admin_manual";
 
 export interface IEmailLog extends Document {
   recipient: mongoose.Types.ObjectId | null;
@@ -20,7 +25,7 @@ const EmailLogSchema = new Schema<IEmailLog>(
     recipientEmail: { type: String, required: true },
     type: {
       type: String,
-      enum: ["verification", "password_reset", "new_dm", "inactivity_reminder"],
+      enum: ["verification", "password_reset", "new_dm", "inactivity_reminder", "admin_manual"],
       required: true,
     },
     subject: { type: String, required: true },
