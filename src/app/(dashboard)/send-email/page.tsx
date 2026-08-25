@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Search, X, Send, Mail } from "lucide-react";
+import { Search, X, Send, Mail, Users } from "lucide-react";
 import { Toast, type ToastState } from "@/components/ui/Toast";
 import { apiFetch } from "@/lib/apiClient";
 import type { AdminUserListItem } from "@/types/user";
@@ -16,6 +16,7 @@ export default function SendEmailPage() {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [selectingAll, setSelectingAll] = useState(false);
   const [toast, setToast] = useState<ToastState | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -44,6 +45,43 @@ export default function SendEmailPage() {
       else next.set(user._id, user);
       return next;
     });
+  }
+
+  async function selectAllActiveUsers() {
+    setSelectingAll(true);
+    try {
+      // status=active already excludes banned accounts; guests and users
+      // with no email on file are filtered out client-side, same as the
+      // search results are.
+      const data = await apiFetch<{ success: boolean; users: AdminUserListItem[] }>(
+        "/api/admin/users?status=active&limit=100"
+      );
+      const eligible = data.users.filter((u) => !u.isGuest && u.email);
+
+      if (eligible.length === 0) {
+        setToast({ type: "error", message: "No eligible active users with an email on file." });
+        return;
+      }
+
+      const capped = eligible.slice(0, MAX_RECIPIENTS);
+      setSelected(new Map(capped.map((u) => [u._id, u])));
+
+      if (eligible.length > MAX_RECIPIENTS) {
+        setToast({
+          type: "error",
+          message: `${eligible.length} eligible users found — only the first ${MAX_RECIPIENTS} were selected (per-send cap). Send this batch, then run it again for the rest.`,
+        });
+      } else {
+        setToast({ type: "success", message: `Selected all ${eligible.length} eligible users.` });
+      }
+    } catch (err) {
+      setToast({
+        type: "error",
+        message: err instanceof Error ? err.message : "Failed to load users.",
+      });
+    } finally {
+      setSelectingAll(false);
+    }
   }
 
   async function handleSend(e: React.FormEvent) {
@@ -90,7 +128,18 @@ export default function SendEmailPage() {
       </div>
 
       <div className="bg-surface border border-border rounded-xl p-4 mb-4">
-        <label className="text-xs font-medium text-muted mb-1 block">Recipients</label>
+        <div className="flex items-center justify-between mb-1">
+          <label className="text-xs font-medium text-muted block">Recipients</label>
+          <button
+            type="button"
+            onClick={selectAllActiveUsers}
+            disabled={selectingAll}
+            className="flex items-center gap-1.5 text-xs text-accent hover:brightness-110 disabled:opacity-50"
+          >
+            <Users className="h-3 w-3" />
+            {selectingAll ? "Loading..." : "Select all active users"}
+          </button>
+        </div>
 
         {selectedList.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-2">
