@@ -13,7 +13,6 @@ import { RoomMessage } from "@/models/RoomMessage";
 import { Conversation } from "@/models/Conversation";
 import { DirectMessage } from "@/models/DirectMessage";
 import { Notification } from "@/models/Notification";
-import { Location } from "@/models/Location";
 import { withAdminAuth, AuthenticatedAdminRequest } from "@/middleware/withAdminAuth";
 import { logAdminAction } from "@/models/AdminAuditLog";
 import { validateBody } from "@/middleware/validate";
@@ -54,14 +53,12 @@ export const GET = withAdminAuth(async (req: AuthenticatedAdminRequest, context)
       eventRsvpCount,
       reviewCount,
       sessionCount,
-      location,
     ] = await Promise.all([
       CommunityMember.countDocuments({ user: userId }),
       Event.countDocuments({ creator: userId }),
       EventRSVP.countDocuments({ user: userId }),
       PlaceReview.countDocuments({ user: userId }),
       Session.countDocuments({ userId }),
-      Location.findOne({ user: userId }).lean(),
     ]);
 
     return NextResponse.json({
@@ -74,7 +71,6 @@ export const GET = withAdminAuth(async (req: AuthenticatedAdminRequest, context)
         reviewCount,
         sessionCount,
       },
-      location,
     });
   } catch (error) {
     console.error("[admin user detail] Error:", error);
@@ -181,7 +177,6 @@ export const DELETE = withAdminAuth(async (req: AuthenticatedAdminRequest, conte
       PlaceReview.deleteMany({ user: userId }),
       RoomMessage.deleteMany({ sender: userId }),
       Notification.deleteMany({ recipient: userId }),
-      Location.deleteMany({ user: userId }),
       DirectMessage.deleteMany({ sender: userId }),
       Conversation.deleteMany({ participants: userId }),
     ]);

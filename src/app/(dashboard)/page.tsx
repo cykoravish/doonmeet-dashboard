@@ -19,8 +19,6 @@ import {
   MapPin,
   Star,
   Tag,
-  MapPinned,
-  Eye,
   ScrollText,
   MessageCircle,
 } from "lucide-react";
@@ -58,18 +56,11 @@ interface PlaceStats {
   avgRating: number | null;
 }
 
-interface LocationStats {
-  total: number;
-  visible: number;
-  hidden: number;
-}
-
 export default function OverviewPage() {
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [communityStats, setCommunityStats] = useState<CommunityStats | null>(null);
   const [eventStats, setEventStats] = useState<EventStats | null>(null);
   const [placeStats, setPlaceStats] = useState<PlaceStats | null>(null);
-  const [locationStats, setLocationStats] = useState<LocationStats | null>(null);
 
   useEffect(() => {
     apiFetch<{ success: boolean; stats: UserStats }>("/api/admin/users/stats")
@@ -83,9 +74,6 @@ export default function OverviewPage() {
       .catch(() => {});
     apiFetch<{ success: boolean; stats: PlaceStats }>("/api/admin/places/stats")
       .then((data) => setPlaceStats(data.stats))
-      .catch(() => {});
-    apiFetch<{ success: boolean; stats: LocationStats }>("/api/admin/locations?limit=1")
-      .then((data) => setLocationStats(data.stats))
       .catch(() => {});
   }, []);
 
@@ -220,28 +208,6 @@ export default function OverviewPage() {
           label="Avg rating"
           value={placeStats?.avgRating != null ? placeStats.avgRating : "–"}
           icon={Star}
-        />
-      </div>
-
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-xs font-medium text-muted uppercase tracking-wide">Locations</h2>
-        <Link
-          href="/locations"
-          className="text-xs text-accent hover:brightness-110 flex items-center gap-1"
-        >
-          View map activity
-          <ArrowRight className="h-3 w-3" />
-        </Link>
-      </div>
-
-      <div className="grid grid-cols-3 gap-3 mb-8 max-w-md">
-        <StatCard label="Total" value={locationStats ? locationStats.total : "–"} icon={MapPinned} />
-        <StatCard label="Visible" value={locationStats ? locationStats.visible : "–"} icon={Eye} />
-        <StatCard
-          label="Hidden"
-          value={locationStats ? locationStats.hidden : "–"}
-          icon={EyeOff}
-          tone={locationStats && locationStats.hidden > 0 ? "warning" : "default"}
         />
       </div>
 
